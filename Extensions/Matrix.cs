@@ -4,8 +4,28 @@ using System.Collections.Generic;
 
 namespace LaboratoryWork.Extensions
 {
-  public static class Enumerable
+  public static class Matrix
   {
+    public static IEnumerable<IList<T>> ToRows<T>(this T[,] matrix)
+    {
+      if (matrix == null)
+        throw new ArgumentNullException(nameof(matrix), "matrix can't be null");
+      
+      int rowCount = matrix.GetLength(0);
+      int columnCount = matrix.GetLength(1);
+
+      IList<IList<T>> rows = new List<IList<T>>();
+      for (var i = 0; i < rowCount; i++)
+      {
+        IList<T> row = new List<T>();
+        for (var j = 0; j < columnCount; j++)
+          row.Add(matrix[i, j]);
+        rows.Add(row);
+      }
+
+      return rows;
+    }
+
     public static T[,] Print<T>(this T[,] matrix, string delimiter = "")
     {
       if (matrix == null)
@@ -29,7 +49,8 @@ namespace LaboratoryWork.Extensions
       {
         for (var j = 0; j < columnCount; j++)
           Console.Write("{0}{1}", matrix[i, j].ToString().PadRight(maxLengths[j]), j + 1 >= columnCount ? string.Empty : delimiter);
-        Console.WriteLine();
+        if (i + 1 < rowCount)
+          Console.WriteLine();
       }
 
       return matrix;
