@@ -6,7 +6,7 @@ namespace LaboratoryWork.Extensions
 {
   public static class Matrix
   {
-    public static IEnumerable<IList<T>> ToRows<T>(this T[,] matrix)
+    public static IEnumerable<T[]> ToRows<T>(this T[,] matrix)
     {
       if (matrix == null)
         throw new ArgumentNullException(nameof(matrix), "matrix can't be null");
@@ -14,12 +14,12 @@ namespace LaboratoryWork.Extensions
       int rowCount = matrix.GetLength(0);
       int columnCount = matrix.GetLength(1);
 
-      IList<IList<T>> rows = new List<IList<T>>();
+      IList<T[]> rows = new List<T[]>();
       for (var i = 0; i < rowCount; i++)
       {
-        IList<T> row = new List<T>();
+        T[] row = new T[columnCount];
         for (var j = 0; j < columnCount; j++)
-          row.Add(matrix[i, j]);
+          row[j] = matrix[i, j];
         rows.Add(row);
       }
 
