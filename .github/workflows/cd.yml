@@ -1,10 +1,8 @@
-name: CI
+name: CD
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags: 'v*'
 
   workflow_dispatch:
 
@@ -26,7 +24,7 @@ jobs:
           path: main.exe
           retention-days: 1
   
-  lint:
+  lint: build
     runs-on: ubuntu-latest
     needs: build
 
@@ -43,7 +41,7 @@ jobs:
         run: |
           sudo apt-get install shellcheck
           shellcheck *.sh
-
+      
       - name: Download Artifacts
         uses: actions/download-artifact@v2
         with:
@@ -54,3 +52,35 @@ jobs:
           sudo apt update
           sudo apt-get install gendarme
           gendarme -- *.exe
+  
+  publish:
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: program
+      - name: Convert Flowchart
+        run: |
+          sudo apt install snapd
+          sudo snap install drawio
+          draw.io -x -o flowchart.pdf flowchart.drawio 
+      - name: Archive
+        run: |
+          tar -cf release.tar main.exe flowchart.pdf
+      
+      - name: Environment Variable Setup
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Publish to GitHub
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ env.RELEASE_VERSION }}"
+          prerelease: false
+          title: "${{ env.RELEASE_VERSION }} Build"
+          files: release.tar
