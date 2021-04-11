@@ -68,7 +68,7 @@ jobs:
       run: |
         sudo apt install snapd
         sudo snap install drawio
-        draw.io -x -o flowchart.pdf flowchart.drawio 
+        drawio -x -o flowchart.pdf flowchart.drawio 
     - name: Archive
       run: |
         tar -cf release.tar main.exe flowchart.pdf
