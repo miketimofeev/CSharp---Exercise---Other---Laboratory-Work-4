@@ -1,10 +1,6 @@
 name: CD
 
-on:
-  push:
-    tags: 'v*'
-
-  workflow_dispatch:
+on: [push]
 
 jobs:
   build:
@@ -66,6 +62,8 @@ jobs:
         name: program
     - name: Convert Flowchart
       run: |
+        sudo mkdir /run/user/1001
+        sudo chmod 777 /run/user/1001
         sudo apt install snapd
         sudo snap install drawio
         drawio -x -o flowchart.pdf flowchart.drawio 
